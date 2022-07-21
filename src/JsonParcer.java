@@ -6,7 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class JsonParcer {
-
     private static final Pattern REGEX_ITEMS = Pattern.compile(".*\\[(.+)\\].*");
     private static final Pattern REGEX_ATRIBUTOS_JSON = Pattern.compile("\"(.+?)\":\"(.*?)\"");
     
@@ -22,7 +21,6 @@ public class JsonParcer {
         List<Map<String, String>> dados = new ArrayList<>();
 
         for (String item : items) {
-
             Map<String, String> atributosItem = new HashMap<>();
 
             Matcher matcherAtributosJson = REGEX_ATRIBUTOS_JSON.matcher(item);

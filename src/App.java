@@ -1,34 +1,35 @@
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 public class App {
     public static void main(String[] args) throws Exception {
+        
+        // String URL = "https://api.mocki.io/v2/549a5d8b";
+        // ExtratorDeConteudo extrator = new ExtratorDeConteudoIMDB();
 
-        String URL = "https://api.mocki.io/v2/549a5d8b";
-        URI endereco = URI.create(URL);
-        var client = HttpClient.newHttpClient();
-        var request = HttpRequest.newBuilder(endereco).GET().build();
-        HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-        String body = response.body();
+        String URL = "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2022-06-12&end_date=2022-06-14";
+        ExtratorDeConteudoNasa extrator = new ExtratorDeConteudoNasa();
+        
+        ClienteHTTP HTTP = new ClienteHTTP();
+        String json = HTTP.buscaDados(URL);
 
-        // System.out.println(body);
+        List<Conteudo> conteudos = extrator.extraiConteudos(json);
 
-        var parcer = new JsonParcer();
-        List<Map<String, String>> listaDeFilmes = parcer.parce(body);
-        System.out.println(listaDeFilmes.size());
-        System.out.println(listaDeFilmes.get(0));
+        var gerador = new GeradorDeStickers();
+        
+        for (Conteudo conteudo : conteudos) {
+            
+            InputStream inputStream = new URL(conteudo.getUrlImagem()).openStream();
+            String nomeDoArquivo = "saida/" + conteudo.getTitulo() + ".png";
 
-        for (Map<String,String> filme : listaDeFilmes) {
-            System.out.println("Tutulo: " + filme.get("title"));
-            System.out.println("poster: " + filme.get("image"));
-            System.out.println("nota: " +  filme.get("imDbRating") + "★");
+            gerador.cria(inputStream, nomeDoArquivo);
+        
             System.out.println();
-
+            System.out.println("Tutulo: " + conteudo.getTitulo());
+            System.out.println("Imagem: " + conteudo.getUrlImagem());
+            // System.out.println("nota: " +  conteudo.get("imDbRating") + "★");
         }
+        System.out.println();
     }
 }
